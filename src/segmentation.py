@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import cv2
 
 # (1b) scale to specified height because algorithm is not scale-invariant
-def get_segments(img_path):
-    img = prepare_img(cv2.imread(img_path),50)
+def get_segments(image):
+    img = prepare_img(cv2.imread(image),50)
 
     # (2) detect words in image
     detections = detect(img,
@@ -18,7 +18,6 @@ def get_segments(img_path):
 
     # (4) show word images
 
-    plt.imshow(img, cmap='gray')
     images=[]
     for i, word in enumerate(line):
         images.append(word.img)

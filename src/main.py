@@ -11,6 +11,7 @@ from model import Model, DecoderType
 from preprocessor import Preprocessor
 from skew import skewCorrect
 import numpy as np
+from postprocessing import postProcess
 class FilePaths:
     """Filenames and paths to data."""
     fn_char_list = '../model/charList.txt'
@@ -133,24 +134,38 @@ def validate(model: Model, loader: DataLoaderIAM, line_mode: bool) -> Tuple[floa
     return char_error_rate, word_accuracy
 
 
-def infer(model: Model, fn_img: Path) -> None:
+def infer(model: Model, fn_img: Path) -> str:
     """Recognizes text in image provided by file path."""
+
+    ##Segmentation
     images= get_segments(fn_img)
+    extractedText=""
+    #Recognize Each Word Individually
     for img in images:
+        ##Binarization with OTSU
         ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         assert img is not None
+
+        ##Skew Correction
         img_rotated=skewCorrect(img)
 
         #Process The Image Such That Image has width is 128 and height is 32
         preprocessor = Preprocessor(get_img_size(), dynamic_width=True, padding=16)
-        cv2.imshow("image",img_rotated)
+
+
         img = preprocessor.process_img(img_rotated)
-    
-        cv2.waitKey(0)
+
         batch = Batch([img], None, 1)
+
         recognized, probability = model.infer_batch(batch, True)
+        if recognized[0]==None:
+            recognized[0]=""
+        processedWord=postProcess(recognized[0])
+        extractedText=extractedText+" "+processedWord
         print(f'Recognized: "{recognized[0]}"')
         print(f'Probability: {probability[0]}')
+    print(extractedText)
+    return extractedText
 
 def parse_args() -> argparse.Namespace:
     """Parses arguments from the command line."""
