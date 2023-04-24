@@ -29,6 +29,6 @@ def correct_skew(image, delta=0.05, limit=15):
 
     return best_angle, corrected
 
-def preProcess(img):
+def skewCorrect(img):
     angle, corrected = correct_skew(img)
     return corrected

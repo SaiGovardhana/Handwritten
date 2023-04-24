@@ -9,8 +9,8 @@ from segmentation import get_segments
 from dataloader_iam import DataLoaderIAM, Batch
 from model import Model, DecoderType
 from preprocessor import Preprocessor
+from skew import skewCorrect
 import numpy as np
-from skew import preProcess
 class FilePaths:
     """Filenames and paths to data."""
     fn_char_list = '../model/charList.txt'
@@ -139,7 +139,7 @@ def infer(model: Model, fn_img: Path) -> None:
     for img in images:
         ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         assert img is not None
-        img_rotated=preProcess(img)
+        img_rotated=skewCorrect(img)
 
         #Process The Image Such That Image has width is 128 and height is 32
         preprocessor = Preprocessor(get_img_size(), dynamic_width=True, padding=16)
