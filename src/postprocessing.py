@@ -10,7 +10,7 @@ def postProcess(word):
         suggestions = [x for x in suggestions if not any(c.isspace() for c in x)]
 
 
-        if suggestions:
-            best_suggestion = suggestions[1]
+        if suggestions and len(suggestions) > 0:
+            best_suggestion = suggestions[0]
             word=best_suggestion
     return word

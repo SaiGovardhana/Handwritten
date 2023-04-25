@@ -11,3 +11,4 @@ dump/
 training/
 model/
 doc/
+src/uploads/*

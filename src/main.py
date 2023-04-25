@@ -141,8 +141,11 @@ def infer(model: Model, fn_img: Path) -> str:
     images= get_segments(fn_img)
     extractedText=""
     #Recognize Each Word Individually
+    words=[]
     for img in images:
         ##Binarization with OTSU
+        #cv2.imshow('image',img)
+        #cv2.waitKey(0)
         ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         assert img is not None
 
@@ -161,11 +164,13 @@ def infer(model: Model, fn_img: Path) -> str:
         if recognized[0]==None:
             recognized[0]=""
         processedWord=postProcess(recognized[0])
+        words.append(recognized)
         extractedText=extractedText+" "+processedWord
+
         print(f'Recognized: "{recognized[0]}"')
         print(f'Probability: {probability[0]}')
-    print(extractedText)
-    return extractedText
+    
+    return [extractedText,images,words]
 
 def parse_args() -> argparse.Namespace:
     """Parses arguments from the command line."""
@@ -227,3 +232,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def extract(path):
+    model = Model(char_list_from_file(), DecoderType.BestPath, must_restore=True)
+    return infer(model, path)
