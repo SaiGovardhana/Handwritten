@@ -144,8 +144,6 @@ def infer(model: Model, fn_img: Path) -> str:
     words=[]
     for img in images:
         ##Binarization with OTSU
-        #cv2.imshow('image',img)
-        #cv2.waitKey(0)
         ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         assert img is not None
 
@@ -187,6 +185,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--dump', help='Dump output of NN to CSV file(s).', action='store_true')
 
     return parser.parse_args()
+##Used In Ipynb
+def infer_single(model,img):
+    preprocessor = Preprocessor(get_img_size(), dynamic_width=True, padding=16)
+    img = preprocessor.process_img(img)
+    batch = Batch([img], None, 1)
+    recognized, probability = model.infer_batch(batch, True)
+    return [recognized,probability]
 
 
 def main():
